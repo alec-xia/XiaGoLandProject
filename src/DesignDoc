@@ -101,3 +101,6 @@ then locate it in my persisted folder.
 
 Specifications only show name and size. However, this is very easily upgradable, add code that prints out other properties
 of a specified file.
+
+Filtering out non-text files was a little tricky and may produce some bugs in edge cases I did not test.
+For common file types, this application should not run into any problems.

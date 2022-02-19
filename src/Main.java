@@ -12,6 +12,23 @@ public class Main {
     /* Current working repository of the user. */
     public static final File CWD = new File(System.getProperty("user.dir"));
 
+    public static FileFilter txtOnly = pathname -> {
+        boolean isFile = pathname.isFile();
+        boolean isHidden = pathname.isHidden();
+
+        try {
+            String fileType = Files.probeContentType(pathname.toPath());
+            if (fileType != null && !fileType.equals("text")) {
+                return false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("There is a malformed file.");
+            System.exit(0);
+        }
+        return isFile && !isHidden;
+    };
+
     public static void main(String... args) throws IOException, ClassNotFoundException {
         /* Creates a hidden .token directory */
         File tokens = new File(CWD, ".tokens");
@@ -67,10 +84,11 @@ public class Main {
             System.exit(0);
         }
     }
+
     /* Searches through files in CWD and prints names of the files containing keyword. */
     private static void search(String keyword) throws IOException{
         ArrayList<String> answers = new ArrayList<>();
-        FileFilter txtOnly = pathname -> pathname.isFile() && !pathname.isHidden();
+
         File[] files = CWD.listFiles(txtOnly);
 
         if (files == null) {
@@ -105,7 +123,7 @@ public class Main {
             TreeMap<String, Integer> fileTokens = (TreeMap<String, Integer>) deserializedFile.readObject();
             deserializedFile.close();
             Integer counter = fileTokens.get(word);
-            System.out.println("Number of times " + word + " appeared in " + fileName + ": " + counter);
+            System.out.println("Number of times " + word + " appears in " + fileName + ": " + counter);
 
         } catch (ClassNotFoundException e) {
             System.out.println("Tokenize files before searching. Use command: tokenize");
@@ -175,8 +193,6 @@ public class Main {
     /* Sorts the text files in CWD by size. Stores the order of files in .persistence. */
     private static void bySizeLowHigh() throws IOException {
 
-        FileFilter txtOnly = pathname -> pathname.isFile() && !pathname.isHidden();
-
         File[] files = CWD.listFiles(txtOnly);
 
         if (files == null) {
@@ -197,7 +213,6 @@ public class Main {
     /* Sorts the text files in CWD by size descending. Stores the order of files in .persistence. */
     private static void bySizeHighLow() throws IOException {
 
-        FileFilter txtOnly = pathname -> pathname.isFile() && !pathname.isHidden();
         File[] files = CWD.listFiles(txtOnly);
 
         if (files == null) {
@@ -217,7 +232,6 @@ public class Main {
     }
     /* Sorts the text files in CWD by alphabetical order. Stores the order of files in .persistence. */
     private static void byNameAZ() throws IOException {
-        FileFilter txtOnly = pathname -> pathname.isFile() && !pathname.isHidden();
         File[] files = CWD.listFiles(txtOnly);
 
         if (files == null) {
@@ -235,7 +249,6 @@ public class Main {
     }
     /* Sorts the text files in CWD by reverse alphabetical order. Stores the order of files in .persistence. */
     private static void byNameZA() throws IOException  {
-        FileFilter txtOnly = pathname -> pathname.isFile() && !pathname.isHidden();
         File[] files = CWD.listFiles(txtOnly);
 
         if (files == null) {
@@ -253,7 +266,6 @@ public class Main {
     }
     /* Applies tokenizeFile to all files in CWD. Then, stores serialized TreeMaps in .tokens. */
     private static void tokenizeAll() throws IOException {
-        FileFilter txtOnly = pathname -> pathname.isFile() && !pathname.isHidden();
         File[] files = CWD.listFiles(txtOnly);
 
         if (files == null) {
@@ -271,10 +283,23 @@ public class Main {
             writer.close();
         }
     }
+    /* Fail safe in case for some reason text file becomes unreadable. */
+    public static String readStringSafe(File f, boolean log) {
+        try {
+            return Files.readString(f.toPath()).toLowerCase();
+        } catch (IOException e) {
+            e.printStackTrace();
+            if (log) {
+                System.out.println("There was a malformed file.");
+            }
+            System.exit(0);
+            return null;
+        }
+    }
     /* First, splits the contents of file f into a String[] by common punctuation delimiters.
     *  Second, creates and returns a TreeMap that contains key: word, value: number of appearances. */
     public static TreeMap<String, Integer> tokenizeFile(File f) throws IOException {
-        String content = Files.readString(f.toPath()).toLowerCase();
+        String content = readStringSafe(f, true);
         String[] tokens = content.split("[\n.,;: ]+");
         TreeMap<String, Integer> tokenMap = new TreeMap<>();
 
