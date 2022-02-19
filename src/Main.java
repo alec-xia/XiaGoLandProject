@@ -18,7 +18,7 @@ public class Main {
 
         try {
             String fileType = Files.probeContentType(pathname.toPath());
-            if (fileType != null && !fileType.equals("text")) {
+            if (fileType != null && !fileType.contains("text")) {
                 return false;
             }
         } catch (IOException e) {
