@@ -27,11 +27,11 @@ USER COMMANDS:
         no arguments
         Tokenizes all text files in CWD
 
-    search arg1
+    searchFile arg1
         arg1: [keyword] (requires tokenize to be ran first)
         Searches for arg1 in all tokenized files
 
-    appears arg1 arg2
+    searchAll arg1 arg2
         arg1: [file name]
         arg2: [keyword]
         Prints the number of appearances of keyword in file
@@ -69,7 +69,7 @@ tokenizeAll:
 search:
     Searches through files in CWD and prints names of the files containing keyword.
     Time Complexity: O(n)
-appears:
+appears (search file):
     Prints the number of times word appears in fileName.
     Time Complexity: O(1)
 

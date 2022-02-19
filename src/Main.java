@@ -64,13 +64,13 @@ public class Main {
                 tokenizeAll();
                 System.out.println("Files tokenized.");
                 break;
-            case "search":
+            case "searchAll":
                 argCheck(2, args);
-                search(args[1]);
+                search(args[1].toLowerCase());
                 break;
-            case "appears":
+            case "searchFile":
                 argCheck(3, args);
-                appears(args[1], args[2]);
+                appears(args[1], args[2].toLowerCase());
                 break;
             default:
                 System.out.println("Command does not exist.");
@@ -88,8 +88,8 @@ public class Main {
     /* Searches through files in CWD and prints names of the files containing keyword. */
     private static void search(String keyword) throws IOException{
         ArrayList<String> answers = new ArrayList<>();
-
-        File[] files = CWD.listFiles(txtOnly);
+        File t = new File(".tokens");
+        File[] files = t.listFiles();
 
         if (files == null) {
             System.out.println("No files in CWD.");
@@ -116,7 +116,7 @@ public class Main {
         }
     }
     /* Prints the number of times word appears in fileName. */
-    private static void appears(String fileName, String word) throws IOException, ClassNotFoundException {
+    private static void appears(String fileName, String word) throws IOException {
         try {
             FileInputStream tokenFile = new FileInputStream(".tokens/" + fileName);
             ObjectInputStream deserializedFile = new ObjectInputStream(tokenFile);
